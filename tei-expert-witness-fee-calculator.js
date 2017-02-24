@@ -152,17 +152,28 @@ function getCSV(){
       } else if(nationalResults.length){
       
         // Update Fee Numbers
-        $('#result-chart-review-fee').html(nationalResults[0]["Fee Chart Review"])
-        $('#result-court-fee').html(nationalResults[0]["Fee Court"])
-        $('#result-deposition-fee').html(nationalResults[0]["Fee Deposition"])
+        $('#result-chart-review-fee .counter').html(nationalResults[0]["Fee Chart Review"])
+        $('#result-court-fee .counter').html(nationalResults[0]["Fee Court"])
+        $('#result-deposition-fee .counter').html(nationalResults[0]["Fee Deposition"])
         
         $('#fee-result-header').html("National Avg. Fees for  " +CALCULATOR.SPECIALTY + " Expert Witnesses")
+
+        // handle counter 
+        $('.counter').countTo({
+                  from: 50,
+                  to: 2500,
+                  speed: 1000,
+                  refreshInterval: 50,
+                  onComplete: function(value) {
+                      console.debug(this);
+                  }
+              });
       
       } else {
         $('#fee-result-header').html('Sorry, We couldn\'t find any fee information for "'+CALCULATOR.SPECIALTY +'"')
       }
 
     }
-
+    
 
   })

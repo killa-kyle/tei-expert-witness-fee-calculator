@@ -37,6 +37,9 @@ function tei_expert_fee_calculator_enqueue_scripts(){
       
         // Autocomplete         
         wp_enqueue_script( 'jquery-autocomplete', plugin_dir_url(__FILE__) . 'js/jquery.autocomplete.min.js',array('jquery','Underscore','jquery-csv'), '1.0.0', false );
+        // Counter  script 
+
+        wp_enqueue_script( 'number-counter', plugin_dir_url(__FILE__) . 'js/jquery.countTo.js', array( 'jquery' ), '1.0.1', true );
 
           // calculator script 
           wp_enqueue_script( 'calculator-script', plugin_dir_url(__FILE__) . 'tei-expert-witness-fee-calculator.js',array('jquery','Underscore','jquery-csv','jquery-autocomplete'), '1.0.0', false );
