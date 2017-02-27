@@ -145,7 +145,9 @@ function getCSV(){
 
 
         // update header 
-        FEE_HEADER.html( CALCULATOR.SPECIALTY + ' Expert Witness Average Fees for ' + CALCULATOR.STATE )
+        FEE_HEADER
+        .html( 'Average ' + CALCULATOR.SPECIALTY + ' Expert Witness Fees for ' + CALCULATOR.STATE )
+        .animateCss('fadeIn')
 
       } else if(nationalResults.length){ // if no state level results show national
       
@@ -178,11 +180,13 @@ function getCSV(){
         
         // update header 
         FEE_HEADER.html("National Average Fees for  " +CALCULATOR.SPECIALTY + " Expert Witnesses")
+        .animateCss('fadeIn')
 
 
       
       } else {
         FEE_HEADER.html('Sorry, We couldn\'t find any fee information for "'+CALCULATOR.SPECIALTY +'"')
+        .animateCss('fadeIn')
         // Update Fee Numbers
         CHART_FEE.html('-')
         COURT_FEE.html('-')
@@ -191,6 +195,14 @@ function getCSV(){
 
 
     }
-    
+    //animateCss
+    $.fn.extend({
+        animateCss: function (animationName) {
+            var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+            this.addClass('animated ' + animationName).one(animationEnd, function() {
+                $(this).removeClass('animated ' + animationName);
+            });
+        }
+    });
 
   })
