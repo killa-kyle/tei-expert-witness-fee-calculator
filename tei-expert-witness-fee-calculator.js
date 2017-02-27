@@ -43,7 +43,7 @@ jQuery(document).ready(function ($) {
   }
 
 
-  // get 
+  // get specialties from fee data 
   function getSpecialties (fee_data) {
     var myResult = _.where(fee_data, {'State': 'US'})
     var SpecialtyList = []
@@ -64,39 +64,12 @@ jQuery(document).ready(function ($) {
         setState({
           SPECIALTY: suggestion.value
         })
-      handleSubmit()
+      // handleSubmit()
       }
     })
   }
 
-  // function getCSV(){
-  //   $.ajax({
-  //     url: feeUrl['feeUrl'],
-  //     async: true,
-  //     success: function (csvd) {
-  //       var items = $.csv.toObjects(csvd)
-  //       var jsonobject = JSON.stringify(items)
-  //       FEEDATA = jsonobject
-  //       console.log('found fees:', items)
-  //       console.log('found specialties:',
-  //             getSpecialties(items)
-  //             )
-  //       var specialties = getSpecialties(items)
-  //       initAutocomplete(specialties)
-
-  //     },
-  //     error: function (xhr, ajaxOptions, thrownError) {
-  //       console.error(thrownError)
-  //           console.log(xhr.status);
-  //           console.log(thrownError);
-  //         },
-  //     dataType: 'text',
-  //     complete: function (data) {
-  //         // call a function on complete
-
-  //     }
-  //   })
-  // }
+// get fee data from post object 
 function getCSV(){
   console.log('GETTTING CSV from ajax')
     
@@ -104,7 +77,6 @@ function getCSV(){
     var csvRequest = $.ajax({
       url: feeAjax.ajaxurl,
       type: 'POST',
-      // dataType: 'text',
       data: {  
         action: feeAjax.action,    
         nonce: feeAjax.ajaxnonce,
@@ -116,14 +88,10 @@ function getCSV(){
       console.log('FOUND FEE DATA')
       var items = $.csv.toObjects(data)
       var jsonobject = JSON.stringify(items)
-      FEEDATA = jsonobject
-      // console.log('found fees:', items)
-      // console.log('found specialties:',
-      //       getSpecialties(items)
-      //       )
-      var specialties = getSpecialties(items)
-      initAutocomplete(specialties)
-      // console.log(feeAjax.fees)
+      FEEDATA = jsonobject //update global fee data 
+      
+      var specialties = getSpecialties(items) // get unique specialties for autocomplete
+      initAutocomplete(specialties) // init autocomplete
     })
 }
 
@@ -137,41 +105,90 @@ function getCSV(){
     });
 
     function handleSubmit(){
-      console.log('submitting....')
+      // cache fee element
+      var CHART_FEE = $('#result-chart-review-fee .counter')
+      var COURT_FEE = $('#result-court-fee .counter')
+      var DEPOSITION_FEE = $('#result-deposition-fee .counter')
+      var FEE_HEADER = $('#fee-result-header')
+
       var results = _.where(JSON.parse(FEEDATA),{'State':CALCULATOR.STATE,'Summarized Specialty Area':CALCULATOR.SPECIALTY})
       var nationalResults = _.where(JSON.parse(FEEDATA),{'State':"US",'Summarized Specialty Area': CALCULATOR.SPECIALTY})
         console.log('found :',results[0])
+
+      // if query found  
       if (results.length){
         // Update Fee Numbers
-        $('#result-chart-review-fee').html(results[0]["Fee Chart Review"])
-        $('#result-court-fee').html(results[0]["Fee Court"])
-        $('#result-deposition-fee').html(results[0]["Fee Deposition"])
+        CHART_FEE.html(results[0]["Fee Chart Review"])
+        COURT_FEE.html(results[0]["Fee Court"])
+        DEPOSITION_FEE.html(results[0]["Fee Deposition"])
+
+        CHART_FEE.countTo({
+                  from: 50,
+                  to:CHART_FEE.html(),
+                  speed: 1000,
+                  refreshInterval: 50
+              });
+
+        COURT_FEE.countTo({
+                  from: 0,
+                  to:COURT_FEE.html(),
+                  speed: 1000,
+                  refreshInterval: 50
+              });
+
+        DEPOSITION_FEE.countTo({
+                  from: 0,
+                  to:DEPOSITION_FEE.html(),
+                  speed: 1000,
+                  refreshInterval: 50
+              });
 
 
-        $('#fee-result-header').html( CALCULATOR.SPECIALTY + ' Expert Witness Average Fees for ' + CALCULATOR.STATE )
-      } else if(nationalResults.length){
+        // update header 
+        FEE_HEADER.html( CALCULATOR.SPECIALTY + ' Expert Witness Average Fees for ' + CALCULATOR.STATE )
+
+      } else if(nationalResults.length){ // if no state level results show national
       
         // Update Fee Numbers
-        $('#result-chart-review-fee .counter').html(nationalResults[0]["Fee Chart Review"])
-        $('#result-court-fee .counter').html(nationalResults[0]["Fee Court"])
-        $('#result-deposition-fee .counter').html(nationalResults[0]["Fee Deposition"])
-        
-        $('#fee-result-header').html("National Avg. Fees for  " +CALCULATOR.SPECIALTY + " Expert Witnesses")
+        CHART_FEE.html(nationalResults[0]["Fee Chart Review"])
+        COURT_FEE.html(nationalResults[0]["Fee Court"])
+        DEPOSITION_FEE.html(nationalResults[0]["Fee Deposition"])
 
-        // handle counter 
-        $('.counter').countTo({
+        CHART_FEE.countTo({
                   from: 50,
-                  to: 2500,
+                  to:CHART_FEE.html(),
                   speed: 1000,
-                  refreshInterval: 50,
-                  onComplete: function(value) {
-                      console.debug(this);
-                  }
+                  refreshInterval: 50
               });
+
+        COURT_FEE.countTo({
+                  from: 0,
+                  to:COURT_FEE.html(),
+                  speed: 1000,
+                  refreshInterval: 50
+              });
+
+        DEPOSITION_FEE.countTo({
+                  from: 0,
+                  to:DEPOSITION_FEE.html(),
+                  speed: 1000,
+                  refreshInterval: 50
+              });
+
+        
+        // update header 
+        FEE_HEADER.html("National Average Fees for  " +CALCULATOR.SPECIALTY + " Expert Witnesses")
+
+
       
       } else {
-        $('#fee-result-header').html('Sorry, We couldn\'t find any fee information for "'+CALCULATOR.SPECIALTY +'"')
+        FEE_HEADER.html('Sorry, We couldn\'t find any fee information for "'+CALCULATOR.SPECIALTY +'"')
+        // Update Fee Numbers
+        CHART_FEE.html('-')
+        COURT_FEE.html('-')
+        DEPOSITION_FEE.html('-')
       }
+
 
     }
     
